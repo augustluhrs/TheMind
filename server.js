@@ -1,3 +1,10 @@
+//"The Mind" 
+//by Maya Pruitt, Noah Pivnick, August Luhrs
+//for Collective Play "Waiting/Turns/Queuing" Assignment
+//ITP Spring 2019 -- Mimi Yin
+//based on "The Mind" card game by Wolfgang Warsch
+
+
 // Create server
 let port = process.env.PORT || 8000;
 let express = require('express');
@@ -14,6 +21,8 @@ let io = require('socket.io').listen(server);
 
 // Keep track of all connected players
 let queue = [];
+//settings from start screen
+let settings = {};
 
 //player sockets
 let players = io.of('/');
@@ -60,8 +69,9 @@ screen.on('connection',
     console.log("Screen has connected: " + socket.id);
 
     //when the screen sets up the game and presses start
-    socket.on('start', function(settings) {
+    socket.on('start', function(startSettings) {
       //sets the variables according to the settings
+      settings = startSettings;
       //initializes the game array by removing cards
       //copies the game array to a deck, then deals out cards (emit 'deal')
       //randomly to each player according to slot in the queue
