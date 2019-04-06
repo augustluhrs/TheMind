@@ -4,6 +4,8 @@
 //ITP Spring 2019 -- Mimi Yin
 //based on "The Mind" card game by Wolfgang Warsch
 
+//MAYA: make a played card turn red
+
 // Open and connect input socket
 let socket = io('/players');
 
@@ -19,6 +21,7 @@ let cardButt1, cardButt2;
 
 function setup() {
   // createCanvas(windowWidth, windowHeight);
+  /*
   cardButt1 = createButton('card 1')
     .mousePressed(function(){
       let next = cardButt1.elt.textContent;
@@ -29,30 +32,33 @@ function setup() {
       let next = cardButt2.elt.textContent;
       socket.emit('card', next);
     });
+  */
   //Recieves the dealt hand at start of game
   socket.on('deal', function(dealtCards) {
     //sets up cards[] and displays them
     cards = dealtCards;
     console.log('cards: ' + cards);
-    cardButt1.elt.textContent = cards[0];
-    cardButt2.elt.textContent = cards[1];
+    // cardButt1.elt.textContent = cards[0];
+    // cardButt2.elt.textContent = cards[1];
     
-    
-    for (i = 0; i < cards.length; i++){
+    // ughhhhhhhhhhh
+    for (let i = 0; i < cards.length; i++){
       cardButts[i] = createButton(cards[i], i)
         .mousePressed(() => {
           console.log(cardButts);
-          let butt = this.value();
-          let next = cardButts[butt].elt.textContent; //whyyyyyyyy
+          // let butt = this.value();
+          let next = cardButts[i].elt.textContent; //whyyyyyyyy
           socket.emit('card', next);
           console.log(next);
+          cardButts[i].hide();
         });
+      cardButts[i].addClass('buttonStyle');
     }
     
     
     //relative to screen size + amount
-    //color gradient?
-    //how do we want to make cards clickable?
+    // color gradient?
+    // how do we want to make cards clickable?
     //card objects?
   });
   

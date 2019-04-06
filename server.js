@@ -44,13 +44,22 @@ players.on('connection',
     // Listen for card messages from players
     socket.on('card', function (playedCard) {
       // Receives the next card to display
-      console.log("Card: " + playedCard);
+      console.log("Card just played: " + playedCard);
       //for now, just sends to screen
-      screen.emit('card', playedCard);
+      // screen.emit('card', playedCard);
       //takes the card value and checks it against the next element in the
       //game array, if it's correct, sends the card to the screen and 
       //updates the game array by incrementing the counter (could also splice)
       //if it's wrong, sends the fail message which unlocks reset
+      if (playedCard == cards[0]){ //if it matches the next card
+        // console.log('0th card ' + cards[0]);
+        screen.emit('card', playedCard);
+        cards.splice(0, 1);
+      } else { //on fail
+        // console.log('cards' + cards);
+        // console.log('0th card' + cards[0]);
+        screen.emit('fail');
+      }
     });
 
     // Listen for this client to disconnect
@@ -78,7 +87,7 @@ screen.on('connection',
       //sets the variables according to the settings
       settings = startSettings;
       //hard code the settings just for first test
-      let level = 2;
+      let level = settings.level;
       //set up the deck array 1 - 100
       for (let i = 1; i <= 100; i++){
         deck.push(i);
@@ -89,31 +98,38 @@ screen.on('connection',
         for (let j = queue.length - 1; j >= 0; j--){
           let r = Math.floor(Math.random() * Math.floor(deck.length-1));
           // let r = Math.floor(random(deck.length-1));
-          console.log(r);
+          // console.log(r);
           cards.push(deck[r]);
           deck.splice(r, 1);
         }
       }
-      console.log("deck " + deck);
+      // console.log("deck " + deck);
       //sorts the game array
       cards = cards.sort(function(a, b){return a - b});
       console.log("sorted cards " + cards);
       
       //then deals out cards (emit 'deal') randomly to each player according to slot in the queue
       //for each player in the queue
-      let dupeCards = cards;
+      let dupeCards = [];
+      for (i = cards.length - 1; i >=0; i--){
+        dupeCards[i] = cards[i];
+      }
+      // let dupeCards = cards;
+      // console.log('cards array after creating dupe: ' + cards);
+      // console.log('dupe array after creating dupe: ' + dupeCards);
+      
       for (i = queue.length -1; i >= 0; i--){
         //sets up nested arrays for the player hands
         // playerCards[i] = [];
         let hand = [];
         for (j = 0; j < level; j++){
           //take a random element from cards
-          let r = Math.floor(Math.random() * Math.floor(cards.length-1));
+          let r = Math.floor(Math.random() * Math.floor(dupeCards.length-1));
           hand.push(dupeCards[r]);
           dupeCards.splice(r, 1);
         }
         console.log(hand);
-         hand = hand.sort(function(a, b){return a - b});
+        hand = hand.sort(function(a, b){return a - b});
         playerCards[i] = hand;
       }
       //now send each hand to the appropriate player
@@ -122,6 +138,8 @@ screen.on('connection',
         let current = queue[i];
         current.emit('deal', playerCards[i]);
       }
+      console.log('after after after' + cards);
+      
       //if timer, starts it
     });
 
