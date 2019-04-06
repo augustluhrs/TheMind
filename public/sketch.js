@@ -5,21 +5,51 @@
 //based on "The Mind" card game by Wolfgang Warsch
 
 // Open and connect input socket
-let socket = io('/');
+let socket = io('/players');
 
 // Listen for confirmation of connection
 socket.on('connect', function() {
   console.log("Player connected");
 });
 
+// an array to hold as many cards in a giv en player's hand (as few as 1)
 let cards = [];
+let cardButts = []; //array of buttons
+let cardButt1, cardButt2;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-
+  // createCanvas(windowWidth, windowHeight);
+  cardButt1 = createButton('card 1')
+    .mousePressed(function(){
+      let next = cardButt1.elt.textContent;
+      socket.emit('card', next);
+    });
+  cardButt2 = createButton('card 2')
+    .mousePressed(function(){
+      let next = cardButt2.elt.textContent;
+      socket.emit('card', next);
+    });
   //Recieves the dealt hand at start of game
-  socket.on('deal', function(cards) {
+  socket.on('deal', function(dealtCards) {
     //sets up cards[] and displays them
+    cards = dealtCards;
+    console.log('cards: ' + cards);
+    cardButt1.elt.textContent = cards[0];
+    cardButt2.elt.textContent = cards[1];
+    
+    
+    for (i = 0; i < cards.length; i++){
+      cardButts[i] = createButton(cards[i], i)
+        .mousePressed(() => {
+          console.log(cardButts);
+          let butt = this.value();
+          let next = cardButts[butt].elt.textContent; //whyyyyyyyy
+          socket.emit('card', next);
+          console.log(next);
+        });
+    }
+    
+    
     //relative to screen size + amount
     //color gradient?
     //how do we want to make cards clickable?
@@ -32,7 +62,7 @@ function setup() {
 
 }
 
-//do we want a concentration phase like in the rulebook?
+//do we want a concentration phase like in the rulebook (http://j.mp/2WKYOCg)?
 //could have them all have to hold a button together to start (after getting dealt the cards)
 //would need to add another layer of start to the server
 

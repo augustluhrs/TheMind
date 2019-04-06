@@ -15,7 +15,8 @@ socket.on('connect', function() {
 
 //game state stuff
 let cnv; //canvas
-let cards = []; //holds all received cards
+// let cards = []; //holds all received cards
+let cardsString = '';
 let settings = {}; //holds the settings to be sent to the server
 let gameStarted = false;
 let lost = false; //can make this more elegant later
@@ -31,6 +32,11 @@ let timerOn = false; //timer toggle
 let timer; //seconds left
 let timerSlider; //slider to set timelimit
 let blindBox; //checkbox to toggle blind mode
+
+// display stuff
+
+// Margin
+let margin = 10;
 
 function setup() {
   cnv = createCanvas(windowWidth, windowHeight);
@@ -52,7 +58,7 @@ function setup() {
     .parent('settings')
     .mousePressed(function(){
       updateSettings();
-      if(timeOn){timer = timerSlider.value();}
+      // if(timeOn){timer = timerSlider.value();}
       socket.emit('start', settings);
       settingDiv.hide(); //hides settings and brings canvas up
     });
@@ -63,7 +69,9 @@ function setup() {
   socket.on('card', function (data) {
     // Receives the next card to display
     console.log("Card: " + data);
+    
     //adds played card to end of cards[]
+    drawCardsString();
   });
   
   //listen for game over from server
@@ -93,10 +101,10 @@ function draw(){
 
 function updateSettings(){
   settings = { //makes sense to put this in the startButtpress right? could also be anon
-    level: levelSlider.value(),
-    timer: timerBox.value(),
-    timelength: timerSlider.value(),
-    blind: blindBox.value()
+    // level: levelSlider.value(),
+    // timer: timerBox.value(),
+    // timelength: timerSlider.value(),
+    // blind: blindBox.value()
   }
 }
 /*
@@ -113,3 +121,28 @@ function playCards(){
   //card color? + black stroke
 }
 */
+// Draw string, character by character
+
+function drawCardsString() {
+  // // Draw a white background
+  // background(255);
+
+  // Start in upper left-hand corner
+  let x = margin;
+  let y = margin;
+  fill(0);
+
+
+    // Draw string, character by character
+    for (let c = 0; c < cardsString.length; c++) {
+      let char = cardsString.charAt(c);
+      text(char, x, y);
+      x += textWidth(char);
+      // Wrap text to next line
+      if (x > width - margin) {
+        x = 0;
+        y += textAscent('h') + textDescent('p');
+      }
+    }
+  
+}
