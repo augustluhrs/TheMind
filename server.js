@@ -84,6 +84,7 @@ players.on('connection',
           }
 
           let howbad = {
+            errorCard: playedCard,
             updatedLives: lives,
             lose: lose
           }

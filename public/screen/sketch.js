@@ -182,17 +182,36 @@ function setup() {
   //listen for game over from server
   socket.on('fail', function(howbad){
     //if they play the wrong card, will deduct lives or display a game over msg
-    if (livesOn){
+    if (livesOn){ //if playing with lives
       lives = howbad.updatedLives;
       console.log(howbad.lose);
-      if (howbad.lose == true) {
+      if (howbad.lose == true) { //if they lost
         fill(255, 0, 0);
         rect(width/2, height/2, width, height);
         fill(0);
         textSize(height/7);
         text('TRY AGAIN', width/2, height/2);
-      }
-    } else {
+      } else { //play the card that triggered the error
+          push();
+          //card rect
+          fill(255, 0, 0);
+          strokeWeight(14);
+          stroke(0);
+          let rand = height/7;
+          let offsetX = random(-rand, rand);
+          let offsetY = random(-rand, rand);
+          rect(width/2 + offsetX, height/2 + offsetY, width-width/6, height-height/6);
+
+          //card number
+          //commented out blind if b/c good to know what caused fail
+          fill(0);
+          stroke(255);
+          strokeWeight(5);
+          textSize(height/5);
+          text("x " + howbad.errorCard + " x", width/2+offsetX, height/2+offsetY);
+          pop();
+        }
+    } else { //if playing with no lives
         fill(255, 0, 0);
         rect(width/2, height/2, width, height);
         fill(0);
