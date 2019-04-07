@@ -4,7 +4,6 @@
 //ITP Spring 2019 -- Mimi Yin
 //based on "The Mind" card game by Wolfgang Warsch
 
-//MAYA: make a played card turn red
 
 // Open and connect input socket
 let socket = io('/players');
@@ -21,18 +20,7 @@ let cardButt1, cardButt2;
 
 function setup() {
   // createCanvas(windowWidth, windowHeight);
-  /*
-  cardButt1 = createButton('card 1')
-    .mousePressed(function(){
-      let next = cardButt1.elt.textContent;
-      socket.emit('card', next);
-    });
-  cardButt2 = createButton('card 2')
-    .mousePressed(function(){
-      let next = cardButt2.elt.textContent;
-      socket.emit('card', next);
-    });
-  */
+  
   //Recieves the dealt hand at start of game
   socket.on('deal', function(dealtCards) {
     //sets up cards[] and displays them
@@ -45,25 +33,34 @@ function setup() {
     for (let i = 0; i < cards.length; i++){
       cardButts[i] = createButton(cards[i], i)
         .mousePressed(() => {
-          console.log(cardButts);
-          // let butt = this.value();
-          let next = cardButts[i].elt.textContent; //whyyyyyyyy
+          // console.log(cardButts);
+          let next = cardButts[i].elt.textContent;
           socket.emit('card', next);
           console.log(next);
           cardButts[i].hide();
         });
       cardButts[i].addClass('buttonStyle');
     }
-    
-    
-    //relative to screen size + amount
-    // color gradient?
-    // how do we want to make cards clickable?
-    //card objects?
+  });
+  
+  socket.on('discard', function(discard){
+    console.log('discard' + discard);
+    for (let i = cardButts.length - 1; i >=0; i--){
+      for (let j = discard.length - 1; j >=0; j--){
+        if (cardButts[i].elt.outerText == discard[j]){
+          cardButts[i].hide();
+        }
+      }
+    }
   });
   
   socket.on('reset', function(){
     //empties cards array and clears screen
+    console.log('reset');
+    for (let i = cardButts.length - 1; i >=0; i--){
+      cardButts[i].hide();
+      // cardButts[i] = [];
+    }
   });
 
 }
@@ -72,19 +69,6 @@ function setup() {
 //could have them all have to hold a button together to start (after getting dealt the cards)
 //would need to add another layer of start to the server
 
-function draw(){
-  //drawCards();
-}
-
-/*function drawCards(){
-  //draws all cards in cards[]
-  //highlight ones played vs unplayed or just remove the played cards?
-  //card mousePressed?
-}
-
-/*
-function playCard(card){
-  socket.emit('card', card);
-}
-
-*/
+// function draw(){
+//   drawCards();
+// }
